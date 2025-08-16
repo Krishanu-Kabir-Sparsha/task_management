@@ -321,16 +321,26 @@ class TaskManagement(models.Model):
         """Check that all subtask deadlines are within task deadline"""
         for task in self:
             if task.date_deadline and task.subtask_ids:
-                task_deadline_date = task.date_deadline.date() if isinstance(
-                    task.date_deadline, fields.Datetime
-                ) else task.date_deadline
+                # Convert task deadline to date for comparison
+                if isinstance(task.date_deadline, datetime):
+                    task_deadline_date = task.date_deadline.date()
+                else:
+                    task_deadline_date = task.date_deadline
                 
-                invalid_subtasks = task.subtask_ids.filtered(
-                    lambda s: s.deadline and s.deadline > task_deadline_date
-                )
+                invalid_subtasks = []
+                for subtask in task.subtask_ids:
+                    if subtask.deadline:
+                        # Convert subtask deadline to date for comparison
+                        if isinstance(subtask.deadline, datetime):
+                            subtask_deadline = subtask.deadline.date()
+                        else:
+                            subtask_deadline = subtask.deadline
+                        
+                        if subtask_deadline > task_deadline_date:
+                            invalid_subtasks.append(subtask)
                 
                 if invalid_subtasks:
-                    subtask_names = ', '.join(invalid_subtasks.mapped('name'))
+                    subtask_names = ', '.join([s.name for s in invalid_subtasks])
                     raise ValidationError(_(
                         'The following subtasks have deadlines beyond the task deadline (%s): %s. '
                         'Please adjust either the task deadline or subtask deadlines.'
@@ -418,9 +428,9 @@ class TaskManagement(models.Model):
         return defaults
     
     @api.model
-    def _read_group_stage_ids(self, stages, domain, order):
+    def _read_group_stage_ids(self, stages, domain):
         """Return all stages for kanban view grouping"""
-        return self.env['task.stage'].search([], order=order)
+        return self.env['task.stage'].search([])
     
     # ========== ACTION METHODS ==========
     
@@ -487,6 +497,26 @@ class TaskManagement(models.Model):
                 elif task.stage_id.name == 'Cancelled':
                     task.progress = 0
         return True
+    
+    def action_open_task(self):
+        """Open task in appropriate form view based on task type"""
+        self.ensure_one()
+        
+        if self.task_type == 'individual':
+            view_id = self.env.ref('task_management.view_individual_task_form').id
+        else:  # team task
+            view_id = self.env.ref('task_management.view_team_task_form').id
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': self.name,
+            'res_model': 'task.management',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'view_id': view_id,
+            'target': 'current',
+            'context': dict(self.env.context)
+        }
     
     # ========== CRUD METHODS ==========
     

@@ -51,7 +51,8 @@
         <field name="domain">[('task_type', '=', 'team')]</field>
         <field name="context">{
             'default_task_type': 'team',
-            'search_default_open_tasks': 1
+            'search_default_open_tasks': 1,
+            'form_view_ref': 'task_management.view_team_task_form'
         }</field>
         <field name="view_ids" eval="[(5, 0, 0),
             (0, 0, {'view_mode': 'list', 'view_id': ref('view_team_task_list')}),
@@ -71,24 +72,26 @@
 
     <!-- All Tasks Action -->
     <record id="action_all_tasks" model="ir.actions.act_window">
-        <field name="name">All Tasks</field>
+        <field name="name">📊 Task Dashboard</field>
         <field name="res_model">task.management</field>
-        <field name="view_mode">list,kanban,form,calendar,activity</field>
+        <field name="view_mode">list,form,kanban,calendar,activity</field>
         <field name="domain">[]</field>
-        <field name="context">{'search_default_open_tasks': 1}</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-            (0, 0, {'view_mode': 'list', 'view_id': ref('view_all_tasks_list')}),
-            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_task_management_kanban')}),
-            (0, 0, {'view_mode': 'calendar', 'view_id': ref('view_task_management_calendar')}),
-            (0, 0, {'view_mode': 'activity', 'view_id': ref('view_task_management_activity')})]"/>
+        <field name="context">{'search_default_open_tasks': 1, 'create': False}</field>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                No tasks created yet!
-            </p>
-            <p>
-                This view shows all tasks - both individual and team tasks.
-                Use filters to view specific task types.
-            </p>
+            <div class="o_view_nocontent_smiling_face">
+                <h2>📋 Welcome to Task Management!</h2>
+                <p>
+                    No tasks created yet. Start by creating your first task!
+                </p>
+                <p>
+                    <a type="action" name="%(action_my_tasks)d" class="btn btn-primary">
+                        <i class="fa fa-user"/> Create Personal Task
+                    </a>
+                    <a type="action" name="%(action_team_tasks)d" class="btn btn-secondary ml-2">
+                        <i class="fa fa-users"/> Create Team Task
+                    </a>
+                </p>
+            </div>
         </field>
     </record>
 
@@ -108,42 +111,43 @@
 
     <!-- Main Menu -->
     <menuitem id="menu_task_management_root"
-              name="Task Management"
-              sequence="5"
-              web_icon="task_management,static/description/icon.png"
-              groups="base.group_user"/>
+            name="Task Management"
+            sequence="5"
+            action="action_all_tasks"
+            web_icon="task_management,static/description/icon.png"
+            groups="base.group_user"/>
+
+    <!-- Dashboard (All Tasks) - First/Default -->
+    <menuitem id="menu_all_tasks"
+            name="📊 Dashboard"
+            parent="menu_task_management_root"
+            action="action_all_tasks"
+            sequence="1"/>
 
     <!-- My Tasks Section -->
     <menuitem id="menu_my_tasks_section"
-              name="My Tasks"
-              parent="menu_task_management_root"
-              action="action_my_tasks"
-              sequence="10"/>
+            name="My Tasks"
+            parent="menu_task_management_root"
+            action="action_my_tasks"
+            sequence="10"/>
 
     <!-- Team Tasks Section -->
     <menuitem id="menu_team_section"
-              name="Team Tasks"
-              parent="menu_task_management_root"
-              sequence="20"/>
+            name="Team Tasks"
+            parent="menu_task_management_root"
+            sequence="20"/>
 
     <menuitem id="menu_teams"
-              name="Teams"
-              parent="menu_team_section"
-              action="action_task_teams"
-              sequence="10"/>
+            name="Teams"
+            parent="menu_team_section"
+            action="action_task_teams"
+            sequence="10"/>
 
     <menuitem id="menu_team_tasks"
-              name="Team Tasks"
-              parent="menu_team_section"
-              action="action_team_tasks"
-              sequence="20"/>
-
-    <!-- All Tasks Section -->
-    <menuitem id="menu_all_tasks"
-              name="All Tasks"
-              parent="menu_task_management_root"
-              action="action_all_tasks"
-              sequence="30"/>
+            name="Team Tasks"
+            parent="menu_team_section"
+            action="action_team_tasks"
+            sequence="20"/>
 
     <!-- Configuration Menu -->
     <menuitem id="menu_task_configuration"
