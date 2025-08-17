@@ -475,24 +475,35 @@ class TaskManagement(models.Model):
                     task.progress = 0
         return True
     
-    def action_open_task(self):
-        """Open task in appropriate form view based on task type"""
-        self.ensure_one()
-        
-        if self.task_type == 'individual':
-            view_id = self.env.ref('task_management.view_individual_task_form').id
-        else:  # team task
-            view_id = self.env.ref('task_management.view_team_task_form').id
-        
+    def action_open_my_tasks(self):
+        """Open My Tasks view"""
         return {
+            'name': 'My Tasks',
             'type': 'ir.actions.act_window',
-            'name': self.name,
             'res_model': 'task.management',
-            'res_id': self.id,
-            'view_mode': 'form',
-            'view_id': view_id,
+            'view_mode': 'list,kanban,form,calendar',
+            'domain': [('task_type', '=', 'individual'), ('user_id', '=', self.env.uid)],
+            'context': {
+                'default_task_type': 'individual',
+                'default_user_id': self.env.uid,
+                'search_default_open_tasks': 1
+            },
             'target': 'current',
-            'context': dict(self.env.context)
+        }
+
+    def action_open_team_tasks(self):
+        """Open Team Tasks view"""
+        return {
+            'name': 'Team Tasks',
+            'type': 'ir.actions.act_window',
+            'res_model': 'task.management',
+            'view_mode': 'list,kanban,form,calendar',
+            'domain': [('task_type', '=', 'team')],
+            'context': {
+                'default_task_type': 'team',
+                'search_default_open_tasks': 1,
+            },
+            'target': 'current',
         }
     
     # ========== CRUD METHODS ==========

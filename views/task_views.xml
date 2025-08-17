@@ -120,7 +120,7 @@
                                         domain="[('parent_task_id', '=', parent.id)]"/>
                                     <field name="name" string="📝 Description" required="1"/>
                                     <field name="unit_amount" widget="float_time" string="⏱️ Hours" required="1" sum="Total"/>
-                                    <!-- <field name="hours_display" string="Time (HH:MM)" readonly="1"/> -->
+                                    <field name="hours_display" string="Time (HH:MM)" readonly="1"/>
                                     <button name="action_edit_time_log" type="object" string="Edit" icon="fa-edit" class="btn-link"/>
                                 </list>
                             </field>
@@ -287,7 +287,7 @@
                                         domain="[('parent_task_id', '=', parent.id)]"/>
                                     <field name="name" string="Work Details" optional="show"/>
                                     <field name="unit_amount" widget="float_time" string="Hours" sum="Total Team Hours"/>
-                                    <!-- <field name="hours_display" string="Time (HH:MM)" readonly="1" optional="show"/> -->
+                                    <field name="hours_display" string="Time (HH:MM)" readonly="1" optional="show"/>
                                 </list>
                             </field>
                             <group string="Time Tracking Info" col="1">
@@ -373,8 +373,8 @@
                 decoration-bf="priority == '3'"
                 decoration-muted="not active">
                 <header>
-                    <button name="%(action_my_tasks)d" type="action" string="➕ Create Personal Task" class="btn-primary" icon="fa-user"/>
-                    <button name="%(action_team_tasks)d" type="action" string="➕ Create Team Task" class="btn-secondary" icon="fa-users"/>
+                    <button name="action_open_my_tasks" type="object" string="➕ Create Personal Task" class="btn-primary" icon="fa-user"/>
+                    <button name="action_open_team_tasks" type="object" string="➕ Create Team Task" class="btn-secondary" icon="fa-users"/>
                 </header>
                 <field name="priority" widget="priority" nolabel="1"/>
                 <field name="name" string="📋 Task Name" class="text-bf"/>
