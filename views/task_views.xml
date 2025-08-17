@@ -347,7 +347,7 @@
         <field name="name">team.task.list</field>
         <field name="model">task.management</field>
         <field name="arch" type="xml">
-            <list string="Team Tasks" decoration-danger="priority == '3'" decoration-warning="date_deadline and date_deadline &lt; current_date and not is_closed" decoration-success="is_closed">
+            <list string="Team Tasks" sample = "1" decoration-danger="priority == '3'" decoration-warning="date_deadline and date_deadline &lt; current_date and not is_closed" decoration-success="is_closed">
                 <field name="priority" widget="priority" nolabel="1"/>
                 <field name="name" string="Task Name"/>
                 <field name="team_id" string="Team"/>

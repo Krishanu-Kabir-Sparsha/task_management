@@ -4,6 +4,7 @@ import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 import { Component, xml } from "@odoo/owl";
 
+// TaskProgressWidget
 class TaskProgressWidget extends Component {
     static template = xml`
         <div class="o_task_progress_widget">

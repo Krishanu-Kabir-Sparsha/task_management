@@ -16,7 +16,7 @@ A comprehensive task management system with:
 - Checklist support
     """,
     'author': 'Krishanu Kabir Sparsha',
-    'website': 'https://www.yourcompany.com',
+    'website': 'https://daffodilplaza.com/',
     'depends': [
         'base',
         'mail',
@@ -24,6 +24,7 @@ A comprehensive task management system with:
         'portal',
         'web',
     ],
+    'excludes': ['documents_spreadsheet'],
     'data': [
         'security/task_security.xml',
         'security/ir.model.access.csv',
@@ -48,4 +49,5 @@ A comprehensive task management system with:
     'auto_install': False,
     'license': 'LGPL-3',
     'images': ['static/description/icon.png'],
+    
 }
