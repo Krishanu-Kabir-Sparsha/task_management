@@ -33,7 +33,7 @@ A comprehensive task management system with:
         'views/task_kanban_views.xml',
         'views/task_calendar_views.xml',
         'views/task_activity_views.xml',
-        'views/task_template_views.xml',
+        # 'views/task_template_views.xml',
         'views/task_config_settings.xml',
         'views/task_menu.xml',
     ],

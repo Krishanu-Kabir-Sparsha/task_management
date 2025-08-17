@@ -69,7 +69,7 @@
                         </page>
                         
                         <page string="✅ Checklist" name="checklist">
-                            <field name="checklist_items" widget="text" placeholder="☐ Step 1: ...&#10;☐ Step 2: ...&#10;☐ Step 3: ..." style="font-size: 14px; line-height: 1.8;"/>
+                            <field name="checklist_items" widget="html" placeholder="Create your checklist with formatting:&#10;• Step 1: ...&#10;• Step 2: ...&#10;• Step 3: ..." options="{'collaborative': true, 'resizable': true}"/>
                         </page>
                         
                         <page string="📋 Subtasks" name="subtasks">
@@ -88,7 +88,7 @@
                         <!-- Update the Time Logs page in Individual Task Form -->
                         <page string="⏱️ Time Logs" name="timesheets">
                             <group string="Time Tracking Summary" col="6">
-                                <field name="planned_hours" widget="float_time" string="Budgeted"/>
+                                <field name="planned_hours" widget="float_time" string="Planned Time"/>
                                 <field name="effective_hours" widget="float_time" string="Logged" readonly="1"/>
                                 <field name="remaining_hours" widget="float_time" string="Remaining" readonly="1"/>
                                 <field name="progress" widget="progressbar" string="Progress %" readonly="1" colspan="3"/>
@@ -116,7 +116,7 @@
                             </field>
                         </page>
                         
-                        <page string="🔗 Relationships" name="relationships">
+                        <!-- <page string="🔗 Relationships" name="relationships">
                             <group>
                                 <group string="Related To">
                                     <field name="partner_id" string="Related Contact"/>
@@ -125,21 +125,17 @@
                                 </group>
                                 <group string="Task Hierarchy">
                                     <field name="parent_id" string="Parent Task" domain="[('id', '!=', id), ('task_type', '=', 'individual')]"/>
-                                    <field name="child_ids" string="Subtasks" readonly="1" widget="many2many_tags"/>
+                                    <field name="child_ids" string="Subtasks" readonly="0" widget="many2many_tags"/>
                                 </group>
                             </group>
-                        </page>
+                        </page> -->
                         
                         <page string="📝 Notes" name="notes">
-                            <field name="notes" placeholder="Add any additional notes or comments here..."/>
+                            <field name="notes" widget="html" placeholder="Add any additional notes, links, or comments here..." options="{'collaborative': true, 'resizable': true}"/>
                         </page>
                     </notebook>
                 </sheet>
-                <!-- <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </div> -->
+                <chatter/>
             </form>
         </field>
     </record>
@@ -198,17 +194,17 @@
                             <label for="progress" string="Overall Progress"/>
                             <div class="o_row">
                                 <field name="progress" widget="progressbar" nolabel="1"/>
-                                <button name="update_progress_from_subtasks" type="object" string="Calculate from Tasks" class="btn-link" icon="fa-calculator"/>
+                                <!-- <button name="update_progress_from_subtasks" type="object" string="Calculate from Tasks" class="btn-link" icon="fa-calculator"/> -->
                             </div>
                             <field name="kanban_state" widget="state_selection" string="Project Status"/>
                         </group>
                     </group>
                     
                     <group>
-                        <group string="Budget &amp; Resources">
-                            <field name="planned_hours" widget="float_time" string="Budgeted Hours"/>
+                        <group string="Time &amp; Resources">
+                            <field name="planned_hours" widget="float_time" string="Total Hours"/>
                             <field name="effective_hours" widget="float_time" string="Consumed Hours" readonly="1"/>
-                            <field name="remaining_hours" widget="float_time" string="Remaining Budget" readonly="1"/>
+                            <field name="remaining_hours" widget="float_time" string="Remaining Hours" readonly="1"/>
                         </group>
                         <group string="Client Information">
                             <field name="partner_id" string="Client/Stakeholder"/>
@@ -243,17 +239,17 @@
                         
                         <!-- Renamed Milestones to Checklist -->
                         <page string="✅ Checklist" name="milestones">
-                            <field name="checklist_items" widget="text" 
-                                placeholder="☐ Requirements Gathering - Due: MM/DD&#10;☐ Design Phase - Due: MM/DD&#10;☐ Development - Due: MM/DD&#10;☐ Testing - Due: MM/DD&#10;☐ Deployment - Due: MM/DD"
-                                style="font-size: 14px; line-height: 2;"/>
+                            <field name="checklist_items" widget="html" 
+                                placeholder="Create your project milestones and checklist:&#10;• Requirements Gathering - Due: MM/DD&#10;• Design Phase - Due: MM/DD&#10;• Development - Due: MM/DD&#10;• Testing - Due: MM/DD&#10;• Deployment - Due: MM/DD"
+                                options="{'collaborative': true, 'resizable': true}"/>
                         </page>
                         
                         <!-- Updated Team Time Logs page -->
                         <page string="⏱️ Team Time Logs" name="team_timesheets">
                             <group string="Project Time Summary" col="4">
-                                <field name="planned_hours" widget="float_time" string="Total Budget (Hours)"/>
+                                <field name="planned_hours" widget="float_time" string="Total Time (Hours)"/>
                                 <field name="effective_hours" widget="float_time" string="Hours Consumed" readonly="1"/>
-                                <field name="remaining_hours" widget="float_time" string="Budget Remaining" readonly="1"/>
+                                <field name="remaining_hours" widget="float_time" string="Time Remaining" readonly="1"/>
                                 <span></span>
                             </group>
                             <field name="timesheet_ids" context="{'default_task_id': id}">
@@ -283,16 +279,12 @@
                         
                         <page string="📁 Resources" name="resources">
                             <group>
-                                <field name="notes" string="Resource Links &amp; Documentation" placeholder="Add links to project documents, repositories, design files, etc."/>
+                                <field name="notes" widget="html" string="Resource Links &amp; Documentation" placeholder="Add links to project documents, repositories, design files, meeting notes, etc." options="{'collaborative': true, 'resizable': true}"/>
                             </group>
                         </page>
                     </notebook>
                 </sheet>
-                <!-- <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </div> -->
+                <chatter/>
             </form>
         </field>
     </record>

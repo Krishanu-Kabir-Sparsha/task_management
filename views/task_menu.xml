@@ -76,7 +76,13 @@
         <field name="res_model">task.management</field>
         <field name="view_mode">list,form,kanban,calendar,activity</field>
         <field name="domain">[]</field>
-        <field name="context">{'search_default_open_tasks': 1, 'create': False}</field>
+        <field name="context">{
+            'search_default_open_tasks': 1, 
+            'create': False,
+            'edit': False,
+            'delete': False,
+            'form_view_initial_mode': 'readonly'
+        }</field>
         <field name="help" type="html">
             <div class="o_view_nocontent_smiling_face">
                 <h2>📋 Welcome to Task Management!</h2>
@@ -168,11 +174,11 @@
               action="action_task_tag"
               sequence="20"/>
 
-    <menuitem id="menu_task_templates"
+    <!-- <menuitem id="menu_task_templates"
               name="Templates"
               parent="menu_task_configuration"
               action="action_task_template"
-              sequence="25"/>
+              sequence="25"/> -->
 
     <menuitem id="menu_task_settings"
               name="Settings"
