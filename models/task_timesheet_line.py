@@ -13,6 +13,7 @@ class TaskTimesheetLine(models.Model):
 
     name = fields.Char(
         string='Work Description',
+        required=True,
         help='Brief description of work done'
     )
     
@@ -41,7 +42,7 @@ class TaskTimesheetLine(models.Model):
     date = fields.Date(
         string='Date',
         required=True,
-        default=fields.Date.today
+        default=fields.Date.context_today
     )
     
     # Time fields with multiple input options
@@ -161,11 +162,37 @@ class TaskTimesheetLine(models.Model):
     
     @api.onchange('subtask_id')
     def _onchange_subtask_id(self):
-        """Auto-fill description from subtask"""
-        if self.subtask_id:
-            if not self.name:
-                self.name = f"Worked on: {self.subtask_id.name}"
+        """Auto-fill date when subtask is selected"""
+        for record in self:
+            if record.subtask_id and record.subtask_id.deadline:
+                record.date = record.subtask_id.deadline
+                if not record.name:  # Also auto-fill description if empty
+                    record.name = record.subtask_id.name
     
+    @api.onchange('date')
+    def _onchange_date(self):
+        """Validate date when changed"""
+        today = fields.Datetime.now().date()  # Get current date from datetime
+        for record in self:
+            if record.date:
+                if record.subtask_id and record.subtask_id.deadline:
+                    if record.date > record.subtask_id.deadline:
+                        return {
+                            'warning': {
+                                'title': _('Warning'),
+                                'message': _('The selected date is after the subtask deadline (%s)', 
+                                           record.subtask_id.deadline.strftime('%Y-%m-%d'))
+                            }
+                        }
+                elif record.date > today:
+                    return {
+                        'warning': {
+                            'title': _('Warning'),
+                            'message': _('You are selecting a future date. Time logs should typically be for past work.')
+                        }
+                    }
+
+
     @api.constrains('unit_amount')
     def _check_unit_amount(self):
         """Validate duration is positive and reasonable"""
@@ -186,10 +213,19 @@ class TaskTimesheetLine(models.Model):
     
     @api.constrains('date')
     def _check_date(self):
-        """Validate date is not in the future"""
+        """Validate time log date"""
+        today = fields.Datetime.now().date()  # Get current date from datetime
         for record in self:
-            if record.date > fields.Date.today():
-                raise ValidationError(_('You cannot log time for future dates.'))
+            # If there's a subtask, allow dates up to its deadline
+            if record.subtask_id and record.subtask_id.deadline:
+                if record.date > record.subtask_id.deadline:
+                    raise ValidationError(_(
+                        'You cannot log time after the subtask deadline (%s)',
+                        record.subtask_id.deadline.strftime('%Y-%m-%d')
+                    ))
+            # If no subtask, use standard validation (no future dates)
+            elif record.date > today:
+                raise ValidationError(_('You cannot log time for future dates'))
     
     @api.model
     def create(self, vals):

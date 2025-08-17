@@ -216,8 +216,19 @@ class TaskManagement(models.Model):
     ], default='this', store=False)
     
     # Additional Information
-    notes = fields.Text(string='Internal Notes')
-    checklist_items = fields.Text(string='Checklist')
+    checklist_items = fields.Html(
+        string='Checklist',
+        sanitize=False,  # Disable sanitization to prevent data attribute issues
+        sanitize_tags=False,  # Allow all HTML tags
+        sanitize_attributes=False  # Don't sanitize attributes
+    )
+
+    notes = fields.Html(
+        string='Internal Notes',
+        sanitize=False,  # Disable sanitization to prevent data attribute issues
+        sanitize_tags=False,  # Allow all HTML tags
+        sanitize_attributes=False  # Don't sanitize attributes
+    )
     
     displayed_image_id = fields.Many2one(
         'ir.attachment',
@@ -316,57 +327,23 @@ class TaskManagement(models.Model):
     
     # ========== ONCHANGE METHODS ==========
 
-    @api.constrains('date_deadline')
-    def _check_subtask_deadlines(self):
-        """Check that all subtask deadlines are within task deadline"""
+    @api.constrains('date_start', 'date_deadline')
+    def _check_date_range(self):
+        """Ensure due date is not before start date"""
         for task in self:
-            if task.date_deadline and task.subtask_ids:
-                # Convert task deadline to date for comparison
-                if isinstance(task.date_deadline, datetime):
-                    task_deadline_date = task.date_deadline.date()
-                else:
-                    task_deadline_date = task.date_deadline
-                
-                invalid_subtasks = []
-                for subtask in task.subtask_ids:
-                    if subtask.deadline:
-                        # Convert subtask deadline to date for comparison
-                        if isinstance(subtask.deadline, datetime):
-                            subtask_deadline = subtask.deadline.date()
-                        else:
-                            subtask_deadline = subtask.deadline
-                        
-                        if subtask_deadline > task_deadline_date:
-                            invalid_subtasks.append(subtask)
-                
-                if invalid_subtasks:
-                    subtask_names = ', '.join([s.name for s in invalid_subtasks])
-                    raise ValidationError(_(
-                        'The following subtasks have deadlines beyond the task deadline (%s): %s. '
-                        'Please adjust either the task deadline or subtask deadlines.'
-                    ) % (task_deadline_date.strftime('%m/%d/%Y'), subtask_names))
+            if task.date_start and task.date_deadline:
+                if task.date_deadline < task.date_start:
+                    raise ValidationError(_('Due Date/Delivery Date cannot be set before Start Date/Kickoff Date'))
 
-    @api.onchange('date_deadline')
-    def _onchange_date_deadline(self):
-        """Warn if changing deadline affects subtasks"""
-        if self.date_deadline and self.subtask_ids:
-            task_deadline_date = self.date_deadline.date() if isinstance(
-                self.date_deadline, fields.Datetime
-            ) else self.date_deadline
-            
-            invalid_subtasks = self.subtask_ids.filtered(
-                lambda s: s.deadline and s.deadline > task_deadline_date
-            )
-            
-            if invalid_subtasks:
-                subtask_names = ', '.join(invalid_subtasks.mapped('name'))
+    @api.onchange('date_start', 'date_deadline')
+    def _onchange_date_range(self):
+        """Show warning when due date is before start date"""
+        if self.date_start and self.date_deadline:
+            if self.date_deadline < self.date_start:
                 return {
                     'warning': {
-                        'title': _('Subtask Deadline Conflict'),
-                        'message': _(
-                            'The following subtasks have deadlines beyond the new task deadline: %s. '
-                            'They will need to be adjusted if you save this change.'
-                        ) % subtask_names
+                        'title': _('Invalid Date Range'),
+                        'message': _('Due Date/Delivery Date cannot be before Start Date/Kickoff Date')
                     }
                 }
     

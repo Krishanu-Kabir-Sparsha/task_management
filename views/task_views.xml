@@ -47,8 +47,10 @@
                     <group>
                         <group string="Task Details">
                             <field name="priority" widget="priority"/>
-                            <field name="date_start" string="Start Date"/>
-                            <field name="date_deadline" string="Due Date"/>
+                            <field name="date_start" string="Start Date" 
+                                help="Task start date. Due date must be after this date."/>
+                            <field name="date_deadline" string="Due Date" 
+                                help="Task due date must be after the start date."/>
                             <label for="progress" string="Progress"/>
                             <div class="o_row">
                                 <field name="progress" widget="progressbar" nolabel="1"/>
@@ -69,7 +71,14 @@
                         </page>
                         
                         <page string="✅ Checklist" name="checklist">
-                            <field name="checklist_items" widget="html" placeholder="Create your checklist with formatting:&#10;• Step 1: ...&#10;• Step 2: ...&#10;• Step 3: ..." options="{'collaborative': true, 'resizable': true}"/>
+                            <field name="checklist_items" 
+                                widget="html" 
+                                placeholder="Create your checklist with formatting:&#10;• Step 1: ...&#10;• Step 2: ...&#10;• Step 3: ..." 
+                                options="{
+                                    'collaborative': true,
+                                    'resizable': true,
+                                    'safe': true
+                                }"/>
                         </page>
                         
                         <page string="📋 Subtasks" name="subtasks">
@@ -79,7 +88,8 @@
                                     <field name="is_done" widget="boolean_toggle"/>
                                     <field name="name" string="Subtask Description"/>
                                     <field name="user_id" widget="many2one_avatar_user" string="Assigned To" optional="show"/>
-                                    <field name="deadline" string="Due Date" optional="show"/>
+                                    <field name="deadline" string="Due Date" 
+                                        help="Must be between parent task's start and due dates"/>
                                     <field name="description" string="Notes" optional="hide"/>
                                 </list>
                             </field>
@@ -110,7 +120,7 @@
                                         domain="[('parent_task_id', '=', parent.id)]"/>
                                     <field name="name" string="📝 Description" required="1"/>
                                     <field name="unit_amount" widget="float_time" string="⏱️ Hours" required="1" sum="Total"/>
-                                    <field name="hours_display" string="Time (HH:MM)" readonly="1"/>
+                                    <!-- <field name="hours_display" string="Time (HH:MM)" readonly="1"/> -->
                                     <button name="action_edit_time_log" type="object" string="Edit" icon="fa-edit" class="btn-link"/>
                                 </list>
                             </field>
@@ -131,7 +141,14 @@
                         </page> -->
                         
                         <page string="📝 Notes" name="notes">
-                            <field name="notes" widget="html" placeholder="Add any additional notes, links, or comments here..." options="{'collaborative': true, 'resizable': true}"/>
+                            <field name="notes" 
+                                widget="html" 
+                                placeholder="Add any additional notes, links, or comments here..." 
+                                options="{
+                                    'collaborative': true,
+                                    'resizable': true,
+                                    'safe': true
+                                }"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -189,8 +206,10 @@
                             <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" string="Project Tags"/>
                         </group>
                         <group string="Timeline">
-                            <field name="date_start" string="Kickoff Date"/>
-                            <field name="date_deadline" string="Delivery Date"/>
+                            <field name="date_start" string="Kickoff Date" 
+                                help="Project kickoff date. Delivery date must be after this date."/>
+                            <field name="date_deadline" string="Delivery Date" 
+                                help="Project delivery date must be after the kickoff date."/>
                             <label for="progress" string="Overall Progress"/>
                             <div class="o_row">
                                 <field name="progress" widget="progressbar" nolabel="1"/>
@@ -226,7 +245,8 @@
                                     <field name="is_done" widget="boolean_toggle" string="Complete"/>
                                     <field name="name" string="Subtask"/>
                                     <field name="user_id" widget="many2one_avatar_user" string="Assigned to" required="1"/>
-                                    <field name="deadline" string="Due"/>
+                                    <field name="deadline" string="Due Date" 
+                                        help="Must be between parent task's start and due dates"/>
                                     <field name="description" string="Details" optional="show"/>
                                 </list>
                             </field>
@@ -239,9 +259,14 @@
                         
                         <!-- Renamed Milestones to Checklist -->
                         <page string="✅ Checklist" name="milestones">
-                            <field name="checklist_items" widget="html" 
-                                placeholder="Create your project milestones and checklist:&#10;• Requirements Gathering - Due: MM/DD&#10;• Design Phase - Due: MM/DD&#10;• Development - Due: MM/DD&#10;• Testing - Due: MM/DD&#10;• Deployment - Due: MM/DD"
-                                options="{'collaborative': true, 'resizable': true}"/>
+                            <field name="checklist_items" 
+                                widget="html" 
+                                placeholder="Create your project milestones and checklist:&#10;• Requirements Gathering - Due: MM/DD&#10;• Design Phase - Due: MM/DD&#10;• Development - Due: MM/DD"
+                                options="{
+                                    'collaborative': true,
+                                    'resizable': true,
+                                    'safe': true
+                                }"/>
                         </page>
                         
                         <!-- Updated Team Time Logs page -->
@@ -262,7 +287,7 @@
                                         domain="[('parent_task_id', '=', parent.id)]"/>
                                     <field name="name" string="Work Details" optional="show"/>
                                     <field name="unit_amount" widget="float_time" string="Hours" sum="Total Team Hours"/>
-                                    <field name="hours_display" string="Time (HH:MM)" readonly="1" optional="show"/>
+                                    <!-- <field name="hours_display" string="Time (HH:MM)" readonly="1" optional="show"/> -->
                                 </list>
                             </field>
                             <group string="Time Tracking Info" col="1">
@@ -279,7 +304,15 @@
                         
                         <page string="📁 Resources" name="resources">
                             <group>
-                                <field name="notes" widget="html" string="Resource Links &amp; Documentation" placeholder="Add links to project documents, repositories, design files, meeting notes, etc." options="{'collaborative': true, 'resizable': true}"/>
+                                <field name="notes" 
+                                    widget="html" 
+                                    string="Resource Links &amp; Documentation" 
+                                    placeholder="Add links to project documents, repositories, design files, meeting notes, etc." 
+                                    options="{
+                                        'collaborative': true,
+                                        'resizable': true,
+                                        'safe': true
+                                    }"/>
                             </group>
                         </page>
                     </notebook>

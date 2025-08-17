@@ -46,52 +46,51 @@ class TaskSubtask(models.Model):
     )
     
     @api.constrains('deadline', 'parent_task_id')
-    def _check_subtask_deadline(self):
-        """Validate that subtask deadline doesn't exceed parent task deadline"""
+    def _check_deadline_range(self):
+        """Ensure subtask deadline is within parent task date range"""
         for subtask in self:
-            if subtask.deadline and subtask.parent_task_id.date_deadline:
-                # Convert parent deadline to date for comparison
-                if isinstance(subtask.parent_task_id.date_deadline, datetime):
-                    parent_deadline_date = subtask.parent_task_id.date_deadline.date()
-                else:
-                    parent_deadline_date = subtask.parent_task_id.date_deadline
+            if subtask.deadline and subtask.parent_task_id:
+                parent_start = subtask.parent_task_id.date_start
+                parent_deadline = subtask.parent_task_id.date_deadline
+
+                if not parent_start or not parent_deadline:
+                    continue
+
+                # Convert all dates to date objects for comparison
+                subtask_date = subtask.deadline
+                parent_start_date = parent_start.date() if isinstance(parent_start, datetime) else parent_start
+                parent_end_date = parent_deadline.date() if isinstance(parent_deadline, datetime) else parent_deadline
                 
-                # Ensure subtask deadline is also a date object for comparison
-                if isinstance(subtask.deadline, datetime):
-                    subtask_deadline = subtask.deadline.date()
-                else:
-                    subtask_deadline = subtask.deadline
-                    
-                if subtask_deadline > parent_deadline_date:
+                if subtask_date < parent_start_date or subtask_date > parent_end_date:
                     raise ValidationError(_(
-                        'Subtask deadline cannot exceed the main task deadline (%s). '
-                        'Please select a date before or on %s.'
-                    ) % (subtask.name, parent_deadline_date.strftime('%m/%d/%Y')))
-    
+                        'Subtask deadline must be within the main task\'s date range (%s - %s)'
+                    ) % (
+                        parent_start_date.strftime('%Y-%m-%d'),
+                        parent_end_date.strftime('%Y-%m-%d')
+                    ))
+
     @api.onchange('deadline')
     def _onchange_deadline(self):
-        """Check deadline when changed"""
-        if self.deadline and self.parent_task_id.date_deadline:
-            # Convert parent deadline to date for comparison
-            if isinstance(self.parent_task_id.date_deadline, datetime):
-                parent_deadline_date = self.parent_task_id.date_deadline.date()
-            else:
-                parent_deadline_date = self.parent_task_id.date_deadline
-            
-            # Ensure self.deadline is also a date object for comparison
-            if isinstance(self.deadline, datetime):
-                subtask_deadline = self.deadline.date()
-            else:
-                subtask_deadline = self.deadline
-                
-            if subtask_deadline > parent_deadline_date:
+        """Show warning if subtask deadline is outside parent task date range"""
+        if self.deadline and self.parent_task_id and self.parent_task_id.date_start and self.parent_task_id.date_deadline:
+            parent_start = self.parent_task_id.date_start
+            parent_deadline = self.parent_task_id.date_deadline
+
+            # Convert to date objects for comparison
+            subtask_date = self.deadline
+            parent_start_date = parent_start.date() if isinstance(parent_start, datetime) else parent_start
+            parent_end_date = parent_deadline.date() if isinstance(parent_deadline, datetime) else parent_deadline
+
+            if subtask_date < parent_start_date or subtask_date > parent_end_date:
                 return {
                     'warning': {
                         'title': _('Invalid Deadline'),
                         'message': _(
-                            'Subtask deadline cannot exceed the main task deadline (%s). '
-                            'Please select an earlier date.'
-                        ) % parent_deadline_date.strftime('%m/%d/%Y')
+                            'Subtask deadline must be within the main task\'s date range (%s - %s)'
+                        ) % (
+                            parent_start_date.strftime('%Y-%m-%d'),
+                            parent_end_date.strftime('%Y-%m-%d')
+                        )
                     }
                 }
     
