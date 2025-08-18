@@ -56,15 +56,3 @@
         }
     }
 }
-
-/* Hide Spreadsheet options in Task Management views */
-.o_action_manager .o_task_management {
-    .o_cp_action_menus {
-        .o_menu_item[data-section="spreadsheet"],
-        .dropdown-item:has(.fa-table),
-        .dropdown-item[title*="spreadsheet"],
-        .dropdown-item:contains("spreadsheet") {
-            display: none !important;
-        }
-    }
-}
