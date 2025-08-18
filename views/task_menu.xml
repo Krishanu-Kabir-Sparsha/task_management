@@ -214,6 +214,26 @@
             sequence="10"
             groups="base.group_user"/>
 
+    <!-- CRM Navigation -->
+    <record id="action_navigate_to_crm" model="ir.actions.server">
+        <field name="name">Go to CRM Module</field>
+        <field name="model_id" ref="base.model_ir_ui_menu"/>
+        <field name="state">code</field>
+        <field name="code">
+    action = {
+        'type': 'ir.actions.act_url',
+        'url': '/web#menu_id=%s' % (env.ref('crm.crm_menu_root').id),
+        'target': 'self',
+    }
+        </field>
+    </record>
+
+    <menuitem id="menu_link_crm"
+            name="💼 CRM"
+            parent="menu_other_modules"
+            action="action_navigate_to_crm"
+            sequence="20"/>
+
    <!-- <menuitem id="menu_link_[module]"
           name="[Display Name]"
           parent="menu_other_modules"
