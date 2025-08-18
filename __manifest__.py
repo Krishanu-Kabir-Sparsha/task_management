@@ -24,7 +24,6 @@ A comprehensive task management system with:
         'portal',
         'web',
     ],
-    'excludes': ['documents_spreadsheet'],
     'data': [
         'security/task_security.xml',
         'security/ir.model.access.csv',
