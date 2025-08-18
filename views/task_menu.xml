@@ -185,4 +185,39 @@
               parent="menu_task_configuration"
               action="action_task_config_settings"
               sequence="30"/>
+
+    <!-- Other Modules Menu -->
+    <menuitem id="menu_other_modules"
+            name="Other Modules"
+            parent="menu_task_management_root"
+            sequence="200"/>
+
+    <!-- Create Server Action with NEW ID -->
+    <record id="action_navigate_to_project" model="ir.actions.server">
+        <field name="name">Go to Project Module</field>
+        <field name="model_id" ref="base.model_ir_ui_menu"/>
+        <field name="state">code</field>
+        <field name="code">
+    action = {
+        'type': 'ir.actions.act_url',
+        'url': '/web#action=project.open_view_project_all&amp;active_id=false&amp;menu_id=%s' % (env.ref('project.menu_main_pm').id),
+        'target': 'self',
+    }
+        </field>
+    </record>
+
+    <!-- Project Module Link -->
+    <menuitem id="menu_link_project"
+            name="📁 Project"
+            parent="menu_other_modules"
+            action="action_navigate_to_project"
+            sequence="10"
+            groups="base.group_user"/>
+
+   <!-- <menuitem id="menu_link_[module]"
+          name="[Display Name]"
+          parent="menu_other_modules"
+          action="[module].[action_name]"
+          sequence="[number]"
+          groups="base.group_user"/> -->
 </odoo>
