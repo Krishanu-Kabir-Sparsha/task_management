@@ -22,10 +22,22 @@ class TaskSubtask(models.Model):
         index=True
     )
     
-    user_id = fields.Many2one(
+    # CHANGED: From Many2one to Many2many for multiple users
+    user_ids = fields.Many2many(
         'res.users',
+        'task_subtask_users_rel',
+        'subtask_id',
+        'user_id',
         string='Assigned to',
         domain="[('share', '=', False), ('active', '=', True)]"
+    )
+    
+    # Keep old field for compatibility, computed from user_ids
+    user_id = fields.Many2one(
+        'res.users',
+        string='Primary Assignee',
+        compute='_compute_primary_user',
+        store=True
     )
     
     is_done = fields.Boolean(
@@ -44,6 +56,12 @@ class TaskSubtask(models.Model):
         readonly=True,
         store=True
     )
+    
+    @api.depends('user_ids')
+    def _compute_primary_user(self):
+        """Set first user as primary for backward compatibility"""
+        for subtask in self:
+            subtask.user_id = subtask.user_ids[0] if subtask.user_ids else False
     
     @api.constrains('deadline', 'parent_task_id')
     def _check_deadline_range(self):
@@ -102,3 +120,15 @@ class TaskSubtask(models.Model):
             if total_subtasks > 0:
                 done_subtasks = len(self.parent_task_id.subtask_ids.filtered('is_done'))
                 self.parent_task_id.progress = (done_subtasks / total_subtasks) * 100
+    
+    def name_get(self):
+        """Display subtask with assignees"""
+        result = []
+        for subtask in self:
+            if subtask.user_ids:
+                users = ', '.join(subtask.user_ids.mapped('name'))
+                name = f"{subtask.name} ({users})"
+            else:
+                name = subtask.name
+            result.append((subtask.id, name))
+        return result

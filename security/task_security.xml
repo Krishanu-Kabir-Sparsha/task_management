@@ -44,10 +44,11 @@
     <record id="task_subtask_rule_user" model="ir.rule">
         <field name="name">Task Subtask: Based on parent task access</field>
         <field name="model_id" ref="model_task_subtask"/>
-        <field name="domain_force">['|', '|',
+        <field name="domain_force">['|', '|', '|',
             ('parent_task_id.user_id', '=', user.id),
             ('parent_task_id.team_ids', 'in', user.id),
-            ('user_id', '=', user.id)]</field>
+            ('user_ids', 'in', user.id),
+            ('parent_task_id.team_id.member_ids', 'in', user.id)]</field>
         <field name="groups" eval="[(4, ref('group_task_user'))]"/>
     </record>
 

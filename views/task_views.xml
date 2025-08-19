@@ -87,7 +87,10 @@
                                     <field name="sequence" widget="handle"/>
                                     <field name="is_done" widget="boolean_toggle"/>
                                     <field name="name" string="Subtask Description"/>
-                                    <field name="user_id" widget="many2one_avatar_user" string="Assigned To" optional="show"/>
+                                    <field name="user_ids" widget="many2many_tags" 
+                                        options="{'no_create': True}" 
+                                        string="Assigned To"
+                                        domain="[('share', '=', False)]"/>
                                     <field name="deadline" string="Due Date" 
                                         help="Must be between parent task's start and due dates"/>
                                     <field name="description" string="Notes" optional="hide"/>
@@ -244,7 +247,11 @@
                                     <field name="sequence" widget="handle"/>
                                     <field name="is_done" widget="boolean_toggle" string="Complete"/>
                                     <field name="name" string="Subtask"/>
-                                    <field name="user_id" widget="many2one_avatar_user" string="Assigned to" required="1"/>
+                                    <field name="user_ids" widget="many2many_tags" 
+                                        options="{'no_create': True}" 
+                                        string="Assigned to"
+                                        domain="[('share', '=', False)]"
+                                        required="1"/>
                                     <field name="deadline" string="Due Date" 
                                         help="Must be between parent task's start and due dates"/>
                                     <field name="description" string="Details" optional="show"/>
@@ -252,7 +259,12 @@
                             </field>
                             <group string="Subtask Guidelines" col="1">
                                 <div class="alert alert-warning" role="alert">
-                                    <strong>Important:</strong> Subtask deadlines cannot exceed the main project delivery date.
+                                    <strong>Important:</strong> 
+                                    <ul>
+                                        <li>Subtask deadlines cannot exceed the main project delivery date</li>
+                                        <li>Multiple team members can be assigned to each subtask</li>
+                                        <li>First assignee is considered the primary responsible</li>
+                                    </ul>
                                 </div>
                             </group>
                         </page>
